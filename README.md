@@ -6,7 +6,7 @@ Checkout my game on Steam! https://store.steampowered.com/app/1384030/Boppio/
 
 ### What does this do?
 
-This is a simple editor implementation for the FastNoise library found here: https://github.com/Auburn/FastNoise. This allows you to quickly view and edit noise generators directly in the UnityEditor.
+This is a simple UnityEditor implementation for the [FastNoise](https://github.com/Auburn/FastNoise) library. This allows you to quickly view and edit noise directly in the editor without having to use an external preview program.
 
 This is what the noise looks like:
 
