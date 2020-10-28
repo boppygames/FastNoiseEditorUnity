@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3f7fe5d17e21f545b76ec19d08710cb, type: 3}
-  m_Name: NoiseExample4
+  m_Name: NoiseExample5
   m_EditorClassIdentifier: 
-  invert: 1
+  invert: 0
   visualizeWarp: 0
   seed: 1337
-  frequency: 0.02
-  noiseType: 3
+  frequency: 0.003
+  noiseType: 0
   rotationType3D: 0
   transformType3D: 0
-  fractalType: 2
+  fractalType: 3
   octaves: 5
-  lacunarity: 2
-  gain: 0.3
+  lacunarity: 4
+  gain: 0.5
   weightedStrength: 0
-  pingPongStength: 2
+  pingPongStength: 2.2
   fractalBounding: 0.5714286
   cellularDistanceFunction: 0
   cellularReturnType: 0
