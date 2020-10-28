@@ -20,7 +20,6 @@ public class FastNoise : ScriptableObject
   [SerializeField] float frequency = 0.01f;
   [SerializeField] FastNoiseLite.NoiseType noiseType = FastNoiseLite.NoiseType.OpenSimplex2;
   [SerializeField] FastNoiseLite.RotationType3D rotationType3D = FastNoiseLite.RotationType3D.None;
-  [SerializeField] FastNoiseLite.TransformType3D transformType3D = FastNoiseLite.TransformType3D.DefaultOpenSimplex2;
 
   [Header("Fractals")]
   [SerializeField] FastNoiseLite.FractalType fractalType = FastNoiseLite.FractalType.None;
@@ -30,7 +29,6 @@ public class FastNoise : ScriptableObject
   [SerializeField] float gain = 0.5f;
   [SerializeField] float weightedStrength = 0.0f;
   [SerializeField] float pingPongStength = 2.0f;
-  [SerializeField] float fractalBounding = 1 / 1.75f;
 
   [Header("Cellular")]
   [SerializeField]
@@ -44,9 +42,6 @@ public class FastNoise : ScriptableObject
 
   [SerializeField] FastNoiseLite.RotationType3D domainWarpRotationType = FastNoiseLite.RotationType3D.None;
 
-  [SerializeField]
-  FastNoiseLite.TransformType3D warpTransformType3D = FastNoiseLite.TransformType3D.DefaultOpenSimplex2;
-
   [SerializeField] float domainWarpAmp = 1.0f;
   [SerializeField] float domainWarpFrequency = 3;
 
@@ -56,14 +51,42 @@ public class FastNoise : ScriptableObject
   [SerializeField] int domainWarpOctaves = 3;
   [SerializeField] float domainWarpLacunarity = 2.0f;
   [SerializeField] float domainWarpGain = 0.5f;
-
   [Header("Preview Settings")]
   [SerializeField] int previewResolution = 256;
-
-  Color32[] ImageData = null;
+  [NonSerialized] Color32[] ImageData = null;
   [NonSerialized] Texture2D previewTexture = null;
   [NonSerialized] Stopwatch sw = null;
 
+  FastNoiseLite runtimeNoise = null;
+
+  void RuntimeInitialize()
+  {
+    runtimeNoise = new FastNoiseLite();
+    runtimeNoise.SetNoiseType(noiseType);
+    runtimeNoise.SetRotationType3D(rotationType3D);
+    runtimeNoise.SetSeed(seed);
+    runtimeNoise.SetFrequency(frequency);
+    runtimeNoise.SetFractalType(fractalType);
+    runtimeNoise.SetFractalOctaves(octaves);
+    runtimeNoise.SetFractalLacunarity(lacunarity);
+    runtimeNoise.SetFractalGain(gain);
+    runtimeNoise.SetFractalWeightedStrength(weightedStrength);
+    runtimeNoise.SetFractalPingPongStrength(pingPongStength);
+
+    runtimeNoise.SetCellularDistanceFunction(cellularDistanceFunction);
+    runtimeNoise.SetCellularReturnType(cellularReturnType);
+    runtimeNoise.SetCellularJitter(cellularJitterModifier);
+  }
+
+  public float GetNoiseValue(float x, float y)
+  {
+    if(runtimeNoise == null)
+      RuntimeInitialize();
+    return runtimeNoise.GetNoise(x, y);
+  }
+
+#if UNITY_EDITOR
+  
   public void GeneratePreview()
   {
     // Create noise generators
@@ -265,8 +288,6 @@ public class FastNoise : ScriptableObject
     previewTexture.SetPixels32(0, 0, w, h, ImageData);
     previewTexture.Apply();
   }
-
-#if UNITY_EDITOR
 
   [CustomEditor(typeof(FastNoise))]
   public class FastNoiseEditor : Editor
