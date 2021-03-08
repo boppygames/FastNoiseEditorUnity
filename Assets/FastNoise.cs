@@ -56,7 +56,7 @@ public class FastNoise : ScriptableObject
   [NonSerialized] Color32[] ImageData = null;
   [NonSerialized] Texture2D previewTexture = null;
   [NonSerialized] Stopwatch sw = null;
-
+  
   FastNoiseLite runtimeNoise = null;
 
   void RuntimeInitialize()
@@ -292,6 +292,9 @@ public class FastNoise : ScriptableObject
   [CustomEditor(typeof(FastNoise))]
   public class FastNoiseEditor : Editor
   {
+    const float autogenerateTimeDefault = 0.40f;
+    const float autogenerateTimeSlow = 2.0f;
+    double lastAutogenerateTime;
     public override void OnInspectorGUI()
     {
       var fn = (FastNoise) target;
@@ -299,6 +302,25 @@ public class FastNoise : ScriptableObject
       if (Screen.width < desiredWidth)
         desiredWidth = Screen.width;
       GUILayout.Space(desiredWidth + 8);
+
+      var autogenerateTime = autogenerateTimeDefault;
+      if (fn != null && fn.sw != null && fn.sw.ElapsedMilliseconds > 500)
+        autogenerateTime = autogenerateTimeSlow;
+      
+      const string autogenerateKey = "editor.fastnoise.autogenerate";
+      var autogeneratePrevious = PlayerPrefs.HasKey(autogenerateKey) && PlayerPrefs.GetInt(autogenerateKey) != 0;
+      var autogenerate = GUILayout.Toggle(autogeneratePrevious, "Automatically Generate Noise");
+      PlayerPrefs.SetInt(autogenerateKey, autogenerate ? 1 : 0);
+
+      if (autogenerate)
+      {
+        if (EditorApplication.timeSinceStartup > lastAutogenerateTime + autogenerateTime)
+        {
+          fn.GeneratePreview();
+          lastAutogenerateTime = EditorApplication.timeSinceStartup;
+        }
+      }
+      
       if (GUILayout.Button("Generate") || fn.previewTexture == null)
         fn.GeneratePreview();
 
@@ -311,6 +333,7 @@ public class FastNoise : ScriptableObject
       if (fn.sw != null)
         GUILayout.Label($"Generation Time (ms): {fn.sw.ElapsedMilliseconds}ms");
       base.OnInspectorGUI();
+      if(autogenerate) Repaint();
     }
   }
 
